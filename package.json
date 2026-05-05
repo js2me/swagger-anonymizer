@@ -1,0 +1,47 @@
+{
+  "name": "swagger-anonymizer",
+  "version": "1.0.0",
+  "description": "CLI tool to anonymize names and examples in OpenAPI (Swagger) YAML/JSON specs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/js2me/swagger-anonymizer.git"
+  },
+  "homepage": "https://github.com/js2me/swagger-anonymizer#readme",
+  "bugs": {
+    "url": "https://github.com/js2me/swagger-anonymizer/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "swagger-anonymizer": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "pnpm run build",
+    "test": "pnpm run build && node --test test/anonymize.test.mjs",
+    "test:update": "pnpm run build && UPDATE_SNAPSHOT=1 node --test test/anonymize.test.mjs"
+  },
+  "keywords": [
+    "openapi",
+    "swagger",
+    "anonymize",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "@faker-js/faker": "^9.4.0",
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
