@@ -11,7 +11,7 @@ import {
 export function printUsage() {
   console.error(
     'Usage: swagger-anonymizer <path-to-openapi.yaml|yml|json>\n\n' +
-      'Anonymizes schema names, operationIds, tags, examples, and descriptions (file is overwritten in place).',
+      'Anonymizes schema names, operationIds, tags, examples, descriptions, summaries, and titles (file is overwritten in place).',
   );
 }
 

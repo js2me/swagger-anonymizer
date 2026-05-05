@@ -10,7 +10,7 @@ function scrubDescriptionsWalk(node) {
   }
   for (const [k, v] of Object.entries(node)) {
     if (
-      k === 'description' &&
+      (k === 'description' || k === 'summary') &&
       typeof v === 'string' &&
       v.length > 0
     ) {
@@ -23,7 +23,7 @@ function scrubDescriptionsWalk(node) {
   }
 }
 
-/** Обходит дерево и подменяет строковые `description` / `title` на текст из faker (фиксированный поток). */
+/** Обходит дерево и подменяет строковые `description`, `summary`, `title` на текст из faker (фиксированный поток). */
 export function scrubDescriptions(node) {
   faker.seed(FAKER_SEED_SCRUB);
   scrubDescriptionsWalk(node);

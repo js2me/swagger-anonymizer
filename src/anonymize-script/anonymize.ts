@@ -14,6 +14,7 @@ import {
   FAKER_SEED,
   FAKER_SEED_EXAMPLES,
   FAKER_SEED_INFO_TAIL,
+  FAKER_SEED_SWAGGER_SERVER,
   FAKER_SEED_TAG_DESCRIPTIONS,
 } from './constants/seeds.js';
 import { fakerizeExamples, neutralizeEnumStrings } from './enums-examples.js';
@@ -46,11 +47,20 @@ export function anonymizeOpenApiInPlace(doc) {
   const names = createUniqueNamers();
 
   const comps = doc.components ?? (doc.components = {});
+  const definitionMap = {};
   const schemaMap = {};
   const responseMap = {};
   const paramMap = {};
   const secRename = {};
 
+  /** Swagger 2.0: models live under `definitions` and `$ref` uses `#/definitions/Name`. */
+  if (doc.definitions && typeof doc.definitions === 'object') {
+    renameTopLevelMap(
+      doc.definitions,
+      definitionMap,
+      names.nextSchemaName,
+    );
+  }
   if (comps.schemas)
     renameTopLevelMap(comps.schemas, schemaMap, names.nextSchemaName);
   if (comps.responses)
@@ -62,7 +72,7 @@ export function anonymizeOpenApiInPlace(doc) {
       names.nextParameterBlockName,
     );
 
-  deepReplaceRefs(doc, schemaMap, responseMap, paramMap);
+  deepReplaceRefs(doc, schemaMap, responseMap, paramMap, definitionMap);
 
   const sec = comps.securitySchemes;
   if (sec && typeof sec === 'object') {
@@ -86,6 +96,23 @@ export function anonymizeOpenApiInPlace(doc) {
   collectPathTemplateParams(doc.paths, propKeys);
   collectParameterNames(doc.paths, propKeys);
   collectComponentParameterNames(comps, propKeys);
+
+  if (
+    (typeof doc.basePath === 'string' && doc.basePath.length > 0) ||
+    (typeof doc.host === 'string' && doc.host.length > 0)
+  ) {
+    faker.seed(FAKER_SEED_SWAGGER_SERVER);
+    const fakeHost = faker.internet.domainName();
+    const slug =
+      faker.helpers.slugify(faker.lorem.words({ min: 2, max: 3 })) || 'api';
+    const fakeBasePath = `/${slug}/`;
+    if (typeof doc.host === 'string' && doc.host.length > 0) {
+      doc.host = fakeHost;
+    }
+    if (typeof doc.basePath === 'string' && doc.basePath.length > 0) {
+      doc.basePath = fakeBasePath;
+    }
+  }
 
   const skipProps = new Set([
     ...OPENAPI_STRUCTURE_KEYS,

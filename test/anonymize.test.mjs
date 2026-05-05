@@ -9,8 +9,11 @@ import YAML from 'yaml';
 import { anonymizeOpenApiInPlace } from '../dist/anonymize-script/anonymize.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const fixturePath = join(__dirname, 'fixtures', 'sample-openapi.yaml');
-const snapshotPath = snapshotPathForFixture(fixturePath);
+
+const FIXTURES = [
+  join(__dirname, 'fixtures', 'sample-openapi.yaml'),
+  join(__dirname, 'fixtures', 'swagger-2.json'),
+];
 
 const UPDATE_SNAPSHOT = process.env.UPDATE_SNAPSHOT === '1';
 
@@ -68,42 +71,47 @@ function snapshotString(doc, format) {
 }
 
 describe('anonymizeOpenApiInPlace', () => {
-  it('matches golden snapshot for sample-openapi.yaml', () => {
-    const format = formatFromFixturePath(fixturePath);
-    const doc = parseFixture(readFileSync(fixturePath, 'utf8'), format);
-    anonymizeOpenApiInPlace(doc);
+  for (const fixturePath of FIXTURES) {
+    const fixtureName = basename(fixturePath);
+    const snapshotPath = snapshotPathForFixture(fixturePath);
 
-    const actual = snapshotString(doc, format);
+    it(`matches golden snapshot for ${fixtureName}`, () => {
+      const format = formatFromFixturePath(fixturePath);
+      const doc = parseFixture(readFileSync(fixturePath, 'utf8'), format);
+      anonymizeOpenApiInPlace(doc);
 
-    if (UPDATE_SNAPSHOT) {
-      mkdirSync(dirname(snapshotPath), { recursive: true });
-      writeFileSync(snapshotPath, actual, 'utf8');
-      return;
-    }
+      const actual = snapshotString(doc, format);
 
-    let expected;
-    try {
-      expected = readFileSync(snapshotPath, 'utf8');
-    } catch (err) {
-      if (err && err.code === 'ENOENT') {
-        assert.fail(
-          `Missing snapshot at ${snapshotPath}. Run: UPDATE_SNAPSHOT=1 pnpm test`,
-        );
+      if (UPDATE_SNAPSHOT) {
+        mkdirSync(dirname(snapshotPath), { recursive: true });
+        writeFileSync(snapshotPath, actual, 'utf8');
+        return;
       }
-      throw err;
-    }
 
-    assert.strictEqual(actual, expected);
-  });
+      let expected;
+      try {
+        expected = readFileSync(snapshotPath, 'utf8');
+      } catch (err) {
+        if (err && err.code === 'ENOENT') {
+          assert.fail(
+            `Missing snapshot at ${snapshotPath}. Run: UPDATE_SNAPSHOT=1 pnpm test`,
+          );
+        }
+        throw err;
+      }
 
-  it('is deterministic for the same fixture input', () => {
-    const format = formatFromFixturePath(fixturePath);
-    const run = () => {
-      const d = parseFixture(readFileSync(fixturePath, 'utf8'), format);
-      anonymizeOpenApiInPlace(d);
-      return snapshotString(d, format);
-    };
+      assert.strictEqual(actual, expected);
+    });
 
-    assert.strictEqual(run(), run());
-  });
+    it(`is deterministic for the same fixture input (${fixtureName})`, () => {
+      const format = formatFromFixturePath(fixturePath);
+      const run = () => {
+        const d = parseFixture(readFileSync(fixturePath, 'utf8'), format);
+        anonymizeOpenApiInPlace(d);
+        return snapshotString(d, format);
+      };
+
+      assert.strictEqual(run(), run());
+    });
+  }
 });
