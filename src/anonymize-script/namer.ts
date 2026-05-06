@@ -63,5 +63,12 @@ export function createUniqueNamers() {
         const tail = `${a}_${n}_${k}`.replace(/_+/g, '_');
         return tail.length > 48 ? tail.slice(0, 48) : tail;
       }),
+    /** Короткие сегменты для относительных путей во внешних $ref (./a/b.yaml). */
+    nextExternalPathSegment: () =>
+      nextUnique(() => {
+        const a = faker.string.alpha({ length: 5, casing: 'lower' });
+        const n = faker.number.int({ min: 1, max: 99 });
+        return `${a}${n}`;
+      }),
   };
 }

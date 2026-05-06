@@ -19,7 +19,11 @@ import {
 } from './constants/seeds.js';
 import { fakerizeExamples, neutralizeEnumStrings } from './enums-examples.js';
 import { createUniqueNamers } from './namer.js';
-import { deepReplaceRefs, renameTopLevelMap } from './refs.js';
+import {
+  buildExternalRefMap,
+  deepReplaceRefs,
+  renameTopLevelMap,
+} from './refs.js';
 import {
   anonymizePathKeys,
   applyComponentParameterRename,
@@ -72,7 +76,15 @@ export function anonymizeOpenApiInPlace(doc) {
       names.nextParameterBlockName,
     );
 
-  deepReplaceRefs(doc, schemaMap, responseMap, paramMap, definitionMap);
+  const externalRefMap = buildExternalRefMap(doc, names);
+  deepReplaceRefs(
+    doc,
+    schemaMap,
+    responseMap,
+    paramMap,
+    definitionMap,
+    externalRefMap,
+  );
 
   const sec = comps.securitySchemes;
   if (sec && typeof sec === 'object') {
