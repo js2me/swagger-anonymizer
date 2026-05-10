@@ -307,6 +307,70 @@ describe('anonymizeOpenApiInPlace', () => {
     assert.doesNotMatch(after, /nas|vendor|local|share|specs|api|LolBeTest/i);
   });
 
+  it('anonymizes object-shaped media type example and examples[].value strings', () => {
+    const doc = {
+      openapi: '3.0.0',
+      info: { title: 't', version: '1.0.0' },
+      components: {
+        responses: {
+          BadRequest: {
+            description: 'bad',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/Err',
+                },
+                example: {
+                  error: 'some parameters required',
+                  hint: 'Editing groups for the service is not supported',
+                },
+                examples: {
+                  named: {
+                    summary: 'x',
+                    value: {
+                      error: 'internal server error',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        schemas: {
+          Err: {
+            type: 'object',
+            properties: {
+              acidic_outset_265: { type: 'string' },
+            },
+          },
+        },
+      },
+      paths: {},
+    };
+
+    anonymizeOpenApiInPlace(doc);
+
+    const responses = doc.components.responses;
+    const responseEntry = Object.values(responses)[0];
+    const mt = responseEntry.content['application/json'];
+    assert.ok(mt.example);
+    assert.match(mt.example.error, /^\w+/);
+    assert.doesNotMatch(
+      mt.example.error,
+      /some parameters required|Editing groups|internal server error/i,
+    );
+    assert.doesNotMatch(
+      mt.example.hint,
+      /some parameters required|Editing groups|internal server error/i,
+    );
+    assert.ok(mt.examples.named.value);
+    assert.match(mt.examples.named.value.error, /^\w+/);
+    assert.doesNotMatch(
+      mt.examples.named.value.error,
+      /internal server error/i,
+    );
+  });
+
   it('is deterministic for a document with an external $ref', () => {
     const run = () => {
       const d = structuredClone(EXTERNAL_REF_FIXTURE);
