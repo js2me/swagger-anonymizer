@@ -1,6 +1,6 @@
 {
   "name": "swagger-anonymizer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CLI tool to anonymize names and examples in OpenAPI (Swagger) YAML/JSON specs",
   "repository": {
     "type": "git",
@@ -12,6 +12,10 @@
   },
   "type": "module",
   "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./anonymize": "./dist/anonymize-script/index.js"
+  },
   "bin": {
     "swagger-anonymizer": "./dist/index.js"
   },
@@ -21,8 +25,8 @@
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "pnpm run build",
-    "test": "pnpm run build && node --test test/anonymize.test.mjs",
-    "test:update": "pnpm run build && UPDATE_SNAPSHOT=1 node --test test/anonymize.test.mjs"
+    "test": "pnpm run build && node --test test/anonymize.test.mjs test/split-openapi.test.mjs",
+    "test:update": "pnpm run build && UPDATE_SNAPSHOT=1 node --test test/anonymize.test.mjs test/split-openapi.test.mjs"
   },
   "keywords": [
     "openapi",

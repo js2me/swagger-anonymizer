@@ -1,0 +1,7 @@
+type: object
+properties:
+  title:
+    type: string
+    description: Human-readable title of the specification content.
+  body:
+    type: string

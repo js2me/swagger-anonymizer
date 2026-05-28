@@ -6,3 +6,5 @@ export const FAKER_SEED_SCRUB = FAKER_SEED + 700;
 export const FAKER_SEED_EXAMPLES = FAKER_SEED + 11;
 /** Seed для `host` / `basePath` (Swagger 2): фиксированная последовательность вызовов faker. */
 export const FAKER_SEED_SWAGGER_SERVER = FAKER_SEED + 401;
+/** Seed для детерминированного переименования локальных файлов схем в split mode. */
+export const FAKER_SEED_LOCAL_SCHEMA_FILES = FAKER_SEED + 512;

@@ -1,0 +1,15 @@
+segment:
+  get:
+    operationId: listSpecifications
+    tags:
+      - specifications
+    summary: List all specifications
+    parameters:
+      - $ref: ../openapi.yaml#/components/parameters/ParamLookupA
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/ModelBundleB

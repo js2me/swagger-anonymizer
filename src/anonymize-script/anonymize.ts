@@ -33,6 +33,7 @@ import {
   replaceTagsStrings,
 } from './rename-ops.js';
 import { scrubDescriptions } from './scrub.js';
+import { anonymizeServerUrls } from './servers.js';
 import {
   anonymizeApiKeySchemeNames,
   rewriteSecurityRefs,
@@ -41,8 +42,9 @@ import { buildSyntheticOpenApiInfo } from './synthetic-info.js';
 
 /**
  * Мутирует переданный объект документа OpenAPI/Swagger (один корневой объект).
+ * @returns {object} maps produced during anonymization
  */
-export function anonymizeOpenApiInPlace(doc) {
+export function anonymizeOpenApiInPlace(doc, options = {}) {
   faker.seed(FAKER_SEED);
   const prevVersion = doc.info?.version ?? '0.0.0';
   const syntheticInfo = buildSyntheticOpenApiInfo(prevVersion);
@@ -144,7 +146,7 @@ export function anonymizeOpenApiInPlace(doc) {
   renameObjectKeys(doc, propRename);
   applyParameterRename(doc.paths, propRename);
   applyComponentParameterRename(comps, propRename);
-  anonymizePathKeys(doc.paths, propRename);
+  const pathKeyMap = anonymizePathKeys(doc.paths, propRename);
 
   const opIds = new Set();
   collectOperationIds(doc.paths, opIds);
@@ -192,4 +194,16 @@ export function anonymizeOpenApiInPlace(doc) {
       }
     }
   }
+
+  if (options.anonymizeServerUrls) {
+    anonymizeServerUrls(doc);
+  }
+
+  return {
+    schemaMap,
+    responseMap,
+    paramMap,
+    definitionMap,
+    pathKeyMap,
+  };
 }

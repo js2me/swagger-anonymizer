@@ -1,0 +1,8 @@
+type: object
+properties:
+  content:
+    $ref: ../openapi.yaml#/components/schemas/ModelPayloadA
+  nova_entity:
+    $ref: ./sch-entity-03.yaml
+required:
+  - content

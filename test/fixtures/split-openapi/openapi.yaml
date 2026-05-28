@@ -1,0 +1,27 @@
+openapi: 3.0.0
+info:
+  title: Real Company Specifications API
+  description: Production API for specification management.
+  version: 2.1.0
+servers:
+  - url: https://real.company/api
+    description: Production environment
+  - url: http://localhost:8080
+    description: Local development
+paths:
+  /specifications:
+    $ref: paths/path-r1.yaml#/segment
+  /audit: {}
+components:
+  schemas:
+    ModelPayloadA:
+      $ref: definitions/sch-content-01.yaml
+    ModelBundleB:
+      $ref: definitions/sch-build-02.yaml
+  parameters:
+    ParamLookupA:
+      name: specification_id
+      in: path
+      required: true
+      schema:
+        type: string

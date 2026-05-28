@@ -1,0 +1,6 @@
+type: object
+properties:
+  id:
+    type: integer
+  sidecar:
+    $ref: ./sch-sidecar-04.yaml

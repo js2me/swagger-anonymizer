@@ -74,7 +74,8 @@ export function applyParameterRename(pathsObj, keyMap) {
 }
 
 export function anonymizePathKeys(pathsObj, propRename) {
-  if (!pathsObj || typeof pathsObj !== 'object') return;
+  const pathKeyMap = {};
+  if (!pathsObj || typeof pathsObj !== 'object') return pathKeyMap;
   const keys = Object.keys(pathsObj).sort((a, b) => a.localeCompare(b));
   const next = {};
   let idx = 0;
@@ -86,10 +87,12 @@ export function anonymizePathKeys(pathsObj, propRename) {
     const brace = [...np.matchAll(/\{([^}]+)\}/g)].map((m) => `{${m[1]}}`);
     const newKey =
       `/r/${++idx}` + (brace.length ? `/${brace.join('/')}` : '');
+    pathKeyMap[pk] = newKey;
     next[newKey] = pathsObj[pk];
     delete pathsObj[pk];
   }
   Object.assign(pathsObj, next);
+  return pathKeyMap;
 }
 
 export function replaceOperationIds(pathsObj, opMap) {
